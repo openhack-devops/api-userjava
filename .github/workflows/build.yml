@@ -48,7 +48,7 @@ jobs:
         id: getSecretsFromKV
         env:
           KV_NAME: openhackagraj1kv
-        uses: Azure/get-keyvault-secrets@v1.0
+        uses: Azure/get-keyvault-secrets@v1
         with:
           keyvault: $KV_NAME
           secrets: 'SQLDBNAME,SQLPASSWORD,SQLSERVER,SQLUSER'
