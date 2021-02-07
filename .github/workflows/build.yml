@@ -36,12 +36,12 @@ jobs:
 
       - name: ACR Build & Push
         env:
-          ACR_REGISTRY: openhackagraj1acr
+          ACR_REGISTRY: openhackagraj1acr.azurecr.io
           ACR_REPOSITORY: devopsoh/api-user-java
           IMAGE_TAG: ${{ github.sha }}
           KV_NAME: openhackagraj1kv
         run: |
-          az acr build -t $ACR_REGISTRY/$ACR_REPOSITORY:$IMAGE_TAG -r $ACR_REGISTRY
+          az acr build -t $ACR_REGISTRY/$ACR_REPOSITORY:$IMAGE_TAG -r $ACR_REGISTRY .
           az keyvault set-policy -n $KV_NAME --secret-permissions get list --spn ${{ secrets.AZURE_CLIENT_ID }}
 
       - name: Get Secrets from KV
