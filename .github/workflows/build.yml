@@ -15,17 +15,44 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up JDK 1.8
-      uses: actions/setup-java@v1
-      with:
-        java-version: 1.8
-        
-    - name: Replace with Secret Values
-      uses: datamonsters/replace-action@v2
-      with:
-        files: 'src/main/resources/application.properties'
-        replacements: '$SQL_SERVER_URL={{secrets.SQL_SERVER_URL}},$SQL_USER={{secrets.SQL_USER},$SQL_PASSWORD={{secrets.SQL_PASSWORD}}'
-       
-    - name: Build with Maven
-      run: mvn -B package --file pom.xml
+      - uses: actions/checkout@v2
+      - name: Set up JDK 1.8
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
+
+      - uses: azure/login@v1
+        with:
+          creds: ${{secrets.AZURE_CREDENTIALS}}
+
+      - name: Replace with Secret Values
+        uses: datamonsters/replace-action@v2
+        with:
+          files: 'src/main/resources/application.properties'
+          replacements: '$SQL_SERVER=${{ secrets.SQL_SERVER }},$SQL_DBNAME=${{ secrets.SQL_DBNAME }},$SQL_USER=${{ secrets.SQL_USER }},$SQL_PASSWORD=${{ secrets.SQL_PASSWORD }}'
+
+      - name: Build with Maven
+        run: mvn -B package --file pom.xml
+
+      - name: ACR Build & Push
+        env:
+          ACR_REGISTRY: openhackagraj1acr
+          ACR_REPOSITORY: devopsoh/api-user-java
+          IMAGE_TAG: ${{ github.sha }}
+          KV_NAME: openhackagraj1kv
+        run: |
+          az acr build -t $ACR_REGISTRY/$ACR_REPOSITORY:$IMAGE_TAG -r $ACR_REGISTRY
+          az keyvault set-policy -n $KV_NAME --secret-permissions get list --spn ${{ secrets.principalId }}
+
+      - name: Get Secrets from KV
+        id: getSecretsFromKV
+        env:
+          KV_NAME: openhackagraj1kv
+        uses: Azure/get-keyvault-secrets@v1.0
+        with:
+          keyvault: $KV_NAME
+          secrets: 'SQLDBNAME,SQLPASSWORD,SQLSERVER,SQLUSER'
+
+      - name: Print Secrets
+        run: |
+          echo "${{ steps.getSecretsFromKV.outputs.SQLDBNAME }} is the db name"
