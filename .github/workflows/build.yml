@@ -42,7 +42,7 @@ jobs:
           KV_NAME: openhackagraj1kv
         run: |
           az acr build -t $ACR_REGISTRY/$ACR_REPOSITORY:$IMAGE_TAG -r $ACR_REGISTRY
-          az keyvault set-policy -n $KV_NAME --secret-permissions get list --spn ${{ secrets.principalId }}
+          az keyvault set-policy -n $KV_NAME --secret-permissions get list --spn ${{ secrets.AZURE_CLIENT_ID }}
 
       - name: Get Secrets from KV
         id: getSecretsFromKV
