@@ -62,8 +62,9 @@ jobs:
         env:
           ACR_REGISTRY: openhackagraj1acr.azurecr.io
           ACR_REPOSITORY: devopsoh/api-user-java
+          IMAGE_TAG: ${{ github.sha }}
           APP_NAME: openhackagraj1userjava
         uses: azure/webapps-deploy@v2
         with:
-          app-name: $APP_NAME
-          images: $ACR_REGISTRY/$ACR_REPOSITORY:latest
+          app-name: openhackagraj1userjava
+          images: $ACR_REGISTRY/$ACR_REPOSITORY:$IMAGE_TAG
