@@ -57,3 +57,13 @@ jobs:
       - name: Print Secrets
         run: |
           echo "${{ steps.getSecretsFromKV.outputs.SQLDBNAME }} is the db name"
+
+      - name: Deploy the ACR Image to App Service
+        env:
+          ACR_REGISTRY: openhackagraj1acr.azurecr.io
+          ACR_REPOSITORY: devopsoh/api-user-java
+          APP_NAME: openhackagraj1userjava
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: $APP_NAME
+          images: $ACR_REGISTRY/$ACR_REPOSITORY:latest
