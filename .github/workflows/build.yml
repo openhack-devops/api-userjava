@@ -21,11 +21,15 @@ jobs:
       with:
         java-version: 1.8
         
+    - uses: azure/login@v1
+      with:
+        creds: ${{secrets.AZURE_CREDENTIALS}} 
+        
     - name: Replace with Secret Values
       uses: datamonsters/replace-action@v2
       with:
         files: 'src/main/resources/application.properties'
-        replacements: '$SQL_SERVER_URL={{secrets.SQL_SERVER_URL}},$SQL_USER={{secrets.SQL_USER},$SQL_PASSWORD={{secrets.SQL_PASSWORD}}'
+        replacements: '$SQL_SERVER_URL=${{secrets.SQL_SERVER_URL}},$SQL_USER=${{secrets.SQL_USER},$SQL_PASSWORD=${{secrets.SQL_PASSWORD}}'
        
     - name: Build with Maven
       run: mvn -B package --file pom.xml
