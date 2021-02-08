@@ -14,8 +14,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: azure/login@v1
-          with:
-            creds: ${{secrets.AZURE_CREDENTIALS}}
+        with:
+          creds: ${{secrets.AZURE_CREDENTIALS}}
       - name: Deploy the ACR Image to App Service
         env:
           ACR_REGISTRY: openhackagraj1acr.azurecr.io
