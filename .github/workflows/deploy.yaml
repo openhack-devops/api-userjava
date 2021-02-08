@@ -20,9 +20,8 @@ jobs:
         env:
           ACR_REGISTRY: openhackagraj1acr.azurecr.io
           ACR_REPOSITORY: devopsoh/api-user-java
-          APP_NAME: devops-api-user-java
+          APP_NAME: openhackagraj1userjava
         uses: azure/webapps-deploy@v2
         with:
           app-name: $APP_NAME
-          publish-profile: ${{ secrets.azureWebAppPublishProfile }}
           images: $ACR_REGISTRY/$ACR_REPOSITORY:latest
