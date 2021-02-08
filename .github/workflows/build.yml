@@ -45,18 +45,18 @@ jobs:
           az acr build -t $ACR_REGISTRY/$ACR_REPOSITORY:$IMAGE_TAG -r $ACR_REGISTRY .
           az keyvault set-policy -n $KV_NAME -g $RG_NAME --secret-permissions get list --spn ${{ secrets.AZURE_CLIENT_ID }}
 
-      - name: Get Secrets from KV
-        id: getSecretsFromKV
-        env:
-          KV_NAME: openhackagraj1kv
-        uses: Azure/get-keyvault-secrets@v1
-        with:
-          keyvault: $KV_NAME
-          secrets: 'SQLDBNAME,SQLPASSWORD,SQLSERVER,SQLUSER'
-
-      - name: Print Secrets
-        run: |
-          echo "${{ steps.getSecretsFromKV.outputs.SQLDBNAME }} is the db name"
+#      - name: Get Secrets from KV
+#        id: getSecretsFromKV
+#        env:
+#          KV_NAME: openhackagraj1kv
+#        uses: Azure/get-keyvault-secrets@v1
+#        with:
+#          keyvault: $KV_NAME
+#          secrets: 'SQLDBNAME,SQLPASSWORD,SQLSERVER,SQLUSER'
+#
+#      - name: Print Secrets
+#        run: |
+#          echo "${{ steps.getSecretsFromKV.outputs.SQLDBNAME }} is the db name"
 
       - name: Deploy the ACR Image to App Service
         env:
