@@ -13,6 +13,11 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    env:
+      ACR_REGISTRY: openhackagraj1acr.azurecr.io
+      ACR_REPOSITORY: devopsoh/api-user-java
+      KV_NAME: openhackagraj1kv
+      RG_NAME: openhackagraj1rg
 
     steps:
       - uses: actions/checkout@v2
@@ -35,36 +40,22 @@ jobs:
         run: mvn -B package --file pom.xml
 
       - name: ACR Build & Push
-        env:
-          ACR_REGISTRY: openhackagraj1acr.azurecr.io
-          ACR_REPOSITORY: devopsoh/api-user-java
-          IMAGE_TAG: ${{ github.sha }}
-          KV_NAME: openhackagraj1kv
-          RG_NAME: openhackagraj1rg
         run: |
-          az acr build -t $ACR_REGISTRY/$ACR_REPOSITORY:$IMAGE_TAG -r $ACR_REGISTRY .
-          az keyvault set-policy -n $KV_NAME -g $RG_NAME --secret-permissions get list --spn ${{ secrets.AZURE_CLIENT_ID }}
+          az acr build -t ${{ env.ACR_REGISTRY}}/${{ env.ACR_REPOSITORY }}:${{ github.sha }} -r ${{ env.ACR_REGISTRY }} .
 
-#      - name: Get Secrets from KV
-#        id: getSecretsFromKV
-#        env:
-#          KV_NAME: openhackagraj1kv
-#        uses: Azure/get-keyvault-secrets@v1
-#        with:
-#          keyvault: $KV_NAME
-#          secrets: 'SQLDBNAME,SQLPASSWORD,SQLSERVER,SQLUSER'
-#
-#      - name: Print Secrets
-#        run: |
-#          echo "${{ steps.getSecretsFromKV.outputs.SQLDBNAME }} is the db name"
+      - name: Get Secrets from KV
+        id: getSecretsFromKV
+        uses: Azure/get-keyvault-secrets@v1
+        with:
+          keyvault: ${{ env.KV_NAME }}
+          secrets: 'SQLDBNAME,SQLPASSWORD,SQLSERVER,SQLUSER'
+
+      - name: Print Secrets
+        run: |
+          echo "${{ steps.getSecretsFromKV.outputs.SQLDBNAME }} is the db name"
 
       - name: Deploy the ACR Image to App Service
-        env:
-          ACR_REGISTRY: openhackagraj1acr.azurecr.io
-          ACR_REPOSITORY: devopsoh/api-user-java
-          IMAGE_TAG: ${{ github.sha }}
-          APP_NAME: openhackagraj1userjava
         uses: azure/webapps-deploy@v2
         with:
-          app-name: $APP_NAME
-          images: $ACR_REGISTRY/$ACR_REPOSITORY:$IMAGE_TAG
+          app-name: ${{ env.APP_NAME }}
+          images: ${{ env.ACR_REGISTRY}}/${{ env.ACR_REPOSITORY }}:${{ github.sha }}
