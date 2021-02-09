@@ -18,6 +18,7 @@ jobs:
       ACR_REPOSITORY: devopsoh/api-user-java
       KV_NAME: openhackagraj1kv
       RG_NAME: openhackagraj1rg
+      APP_NAME: openhackagraj1userjava
 
     steps:
       - uses: actions/checkout@v2
