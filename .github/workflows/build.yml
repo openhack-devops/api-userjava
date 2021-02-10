@@ -6,8 +6,6 @@ name: Build
 on:
   push:
     branches: [ main ]
-  pull_request:
-    branches: [ main ]
 
 jobs:
   build:
@@ -31,19 +29,6 @@ jobs:
         with:
           creds: ${{secrets.AZURE_CREDENTIALS}}
 
-      - name: Replace with Secret Values
-        uses: datamonsters/replace-action@v2
-        with:
-          files: 'src/main/resources/application.properties'
-          replacements: '$SQL_SERVER=${{ secrets.SQL_SERVER }},$SQL_DBNAME=${{ secrets.SQL_DBNAME }},$SQL_USER=${{ secrets.SQL_USER }},$SQL_PASSWORD=${{ secrets.SQL_PASSWORD }}'
-
-      - name: Build with Maven
-        run: mvn -B package --file pom.xml
-
-      - name: ACR Build & Push
-        run: |
-          az acr build -t ${{ env.ACR_REGISTRY}}/${{ env.ACR_REPOSITORY }}:${{ github.sha }} -r ${{ env.ACR_REGISTRY }} .
-
       - name: Get Secrets from KV
         id: getSecretsFromKV
         uses: Azure/get-keyvault-secrets@v1
@@ -51,9 +36,18 @@ jobs:
           keyvault: ${{ env.KV_NAME }}
           secrets: 'SQLDBNAME,SQLPASSWORD,SQLSERVER,SQLUSER'
 
-      - name: Print Secrets
+      - name: Replace with Secret Values
+        uses: datamonsters/replace-action@v2
+        with:
+          files: 'src/main/resources/application.properties'
+          replacements: '$SQL_SERVER=${{ env.SQLSERVER }},$SQL_DBNAME=${{ env.SQL_DBNAME }},$SQL_USER=${{ env.SQLUSER }},$SQL_PASSWORD=${{ env.SQLPASSWORD }}'
+
+      - name: Build with Maven
+        run: mvn -B package --file pom.xml
+
+      - name: ACR Build & Push
         run: |
-          echo "${{ steps.getSecretsFromKV.outputs.SQLDBNAME }} is the db name"
+          az acr build -t ${{ env.ACR_REGISTRY}}/${{ env.ACR_REPOSITORY }}:${{ github.sha }} -r ${{ env.ACR_REGISTRY }} .
 
       - name: Deploy the ACR Image to App Service
         uses: azure/webapps-deploy@v2
