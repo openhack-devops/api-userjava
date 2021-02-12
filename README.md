@@ -58,7 +58,7 @@ curl -X POST --header 'Content-Type: application/json' --header 'Accept: applica
    "totalTrips": 0, \ 
    "updatedAt": "2018-08-07", \ 
    "userId": "Hacker3" \ 
- }' 'http://localhost:8080/api/user/1234'
+ }' 'http://localhost:8080/api/user-java/1234'
 ```
 
 ### PATCH API Example
@@ -69,5 +69,5 @@ This updates the `fuelConsumption` and `hardStops` fields from the user created 
 curl -X PATCH --header 'Content-Type: application/json' --header 'Accept: application/json' -d '{ \ 
   "fuelConsumption":20, \ 
   "hardStops":74371 \ 
-}
+}' 'http://localhost:8080/api/user-java/1234'
 ```
